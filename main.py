@@ -22,7 +22,7 @@ def get_users(name : str = None):
     }    
 
 @app.get("/products")
-def get_users(limit : int = 10 ):
+def get_users(limit : int = 10 ): 
     return {
         "limit" :  limit
     }
