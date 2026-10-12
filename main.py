@@ -26,3 +26,10 @@ def get_users(limit : int = 10 ):
     return {
         "limit" :  limit
     }
+
+@app.get("/items")
+def get_items(name : str = None, price : float = None):
+    return{
+        "name" : name,
+        "price" : price
+    }
