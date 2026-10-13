@@ -14,8 +14,8 @@ class Todo(BaseModel):
 @app.post("/todos")
 def post_todos(todo : Todo):
     todos.append(todo)
-    return {
-        "todo": todo
+    return{
+    "message": "Todo created successfully",
     }
 
 # Read all todos
