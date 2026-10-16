@@ -1,28 +1,42 @@
-from fastapi import FastAPI
-import sqlite3
+from sqlalchemy import create_engine,Column,Integer,String
+from sqlalchemy.orm import sessionmaker,declarative_base,Session
+from fastapi import FastAPI,Depends
 
 app = FastAPI()
 
-conn = sqlite3.connect("test.db" , check_same_thread=False)
+DATABASE_URL = "sqlite:///./test.db"
 
-cursor = conn.cursor()
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread":False}
+)
+  
+sessionLocal = sessionmaker(bind=engine)     
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS todos(
-        id INTEGER PRIMERY KEY,
-        title TEXT,
-        completed TEXT
-    )
-""")
+Base = declarative_base()
 
-conn.commit()
+class Todo(Base):
+    __tablename__ = "todos"
 
-@app.get("/")
-def home():
-    return {
-        "message" : "SQLite Connected fine"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String)
+    completed = Column(String)
+
+
+Base.metadata.create_all(bind=engine)
+
+def get_db():
+    db = sessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()   
+
+@app.get("/")         
+def home(db : Session = Depends(get_db)):
+    return{
+        "message" : "DB connected fine"
     }
-
 
 
 
