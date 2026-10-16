@@ -1,20 +1,20 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,Request
+import time
 
 app = FastAPI()
 
-# Home route
-@app.get("/")
-def home():
-    return {"message": "Welcome to the FastAPI application! venv"}
+@app.middleware("http")
+async def  log_middleware(request:Request , call_next):
+    start_time = time.time()
 
-#About route
-@app.get("/about")
-def about():
-    return {"message": "This is aboutpage"}
+    response = await call_next(request)
 
-#Users page
-@app.get("/users")
-def users():
-    return {
-        "users":["Mohit","Rohit","Amit","Ramesh"]
-    }    
+    process_time = time.time() - start_time
+
+    print(f"Path:{request.url.path} | Time:{process_time}") 
+
+    return response
+
+
+
+
