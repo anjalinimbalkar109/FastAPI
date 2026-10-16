@@ -1,21 +1,28 @@
-from fastapi import FastAPI
-from pydantic import BaseModel 
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
+
 
 app = FastAPI()
 
-class User(BaseModel):
-        name: str
-        age : int
-        password : str
+class UserNotFoundException(Exception):
+    def __init__(self,name:str):
+         self.name = name
 
-class UserResponse(BaseModel):
-        name : str
-        age : int
+@app.exception_handler(UserNotFoundException)
+def user_not_found_exception_handler(request:Request, exc:UserNotFoundException):
+    return JSONResponse(
+        status_code = 404,
+        content = {
+            "status" : "error",
+            "message": f"User {exc.name} not found"
+        }
+    )
 
-@app.get("/users", response_model = UserResponse)  
-def get_user():
+@app.get("/user/{name}")
+def get_user(name:str):
+    if name != "John":
+        raise UserNotFoundException(name)
     return{
-            "name" : "John Doe",
-            "age" : 30,
-            "password" : "secret12"
-    }               
+        "name" : name
+    }
+
