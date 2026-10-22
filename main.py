@@ -32,10 +32,15 @@ def get_db():
     finally:
         db.close()   
 
-@app.get("/")         
-def home(db : Session = Depends(get_db)):
+@app.post("/todos")
+def create_todo(title:str,db:Session = Depends(get_db)):
+    todo = Todo(title=title,completed=False)
+    db.add(todo)
+    db.commit()
+    db.refresh(todo)
     return{
-        "message" : "DB connected fine"
+        "message" : "Todo create",
+        "data" : todo
     }
 
 
